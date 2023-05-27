@@ -1,16 +1,19 @@
 # bot.py
 import os
+import random
 
-import discord
+from discord.ext import commands
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client()
+bot = commands.Bot(command_prefix='!')
 
-@client.event
-async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+@bot.command(name='help')
+async def help_command(ctx):
+    help_text = 'Welcome to the bot! I can help you'
 
-client.run(TOKEN)
+    await ctx.send(response)
+
+bot.run(TOKEN)
