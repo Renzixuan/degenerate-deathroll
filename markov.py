@@ -1,6 +1,8 @@
 # markov.py
 import numpy as np
+from functools import lru_cache
 
+@lru_cache(maxsize=256)
 async def get_ideal_rolls(start, desired_p):
     tmat = await get_markov_tmat(start)
 
