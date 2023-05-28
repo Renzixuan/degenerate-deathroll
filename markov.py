@@ -15,7 +15,6 @@ async def get_ideal_rolls(start, desired_p):
         init_progression = np.matmul(init_progression, tmat)
         p = init_progression[-1]
 
-
     return roll_count + 1
 
 async def get_markov_tmat(n):

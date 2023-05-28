@@ -34,6 +34,7 @@ async def start_bet(ctx, start_rolls, desired_p=50):
     start = int(start_rolls)
     if start > 10000:
         await ctx.author.send('Sorry, max amount is 10000')
+        return
 
     response = ''
 
