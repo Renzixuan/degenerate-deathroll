@@ -5,7 +5,7 @@ import discord
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from db import record_bet
+from db import record_bet, create_new_session
 from markov import *
 
 load_dotenv()
@@ -36,11 +36,17 @@ async def start_bet(ctx, start_rolls, desired_p=50):
         await ctx.author.send('Sorry, max amount is 10000')
         return
 
-    response = ''
+    try:
+        result = await create_new_session()
+        await ctx.author.send(result)
+    except Exception:
+        await ctx.author.send('A bet is already on going, cannot start a new one.')
+        return
 
-    # TODO: Create a new session
-    ideal_roll_num = await get_ideal_rolls(start, float(desired_p)/100)
-    response = f'You\'ve started a bet! \nHouse roll should be {ideal_roll_num}.'
+    response = ''
+    
+    (ideal_roll_num, p) = await get_ideal_rolls(start, float(desired_p)/100)
+    response = f'You\'ve started a bet! \nHouse roll should be {ideal_roll_num}, \nPercentage is {p}.'
     
     await ctx.author.send(response)
     await ctx.send(f'A bet has started for {start}! Place your bet now :)')
