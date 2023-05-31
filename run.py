@@ -58,7 +58,7 @@ async def start(interaction: discord.Interaction, start: int, desired_p: int = 5
         await interaction.response.send_message('Sorry, max amount is 10000', ephemeral = True)
         return
     elif start <= 0:
-        await interaction.response.sen_message('Invalid roll number. Try again please!', ephemeral = True)
+        await interaction.response.send_message('Invalid roll number. Try again please!', ephemeral = True)
         return
 
     try:
