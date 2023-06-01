@@ -61,12 +61,12 @@ def check_ongoing_session():
 
     return int(sessions_count) > 0
 
-def create_new_session(gold):
+def create_new_session(pool_amount):
     ongoing_session = check_ongoing_session()
     if ongoing_session is True:
         raise Exception("There's already a bet ongoing, cannot start a new one.")
 
-    query = f'INSERT INTO sessions(amount) VALUES({gold});'
+    query = f'INSERT INTO sessions(amount) VALUES({pool_amount});'
     mycursor.execute(query)
     mydb.commit()
 

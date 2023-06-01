@@ -2,6 +2,7 @@
 import os
 import discord
 
+from threading import *
 from discord import app_commands
 from discord.ext import commands
 from discord.utils import get
@@ -20,10 +21,11 @@ intents.members = True
 class botClient(discord.Client):
     def __init__(self):
         super().__init__(intents = intents)
-        self.synced = False
-        self.added = False
+        self.synced = True
+        self.added = True
     
     async def on_ready(self):
+        # await tree.sync()
         await self.wait_until_ready()
         if not self.synced:
             await tree.sync(guild = discord.Object(id=GUILD_ID))
@@ -53,28 +55,31 @@ async def bet(interaction: discord.Interaction, gold: int):
 
 @tree.command(description='Start a bet', guild = discord.Object(id=GUILD_ID))
 @commands.has_permissions(administrator=True)
-async def start(interaction: discord.Interaction, start: int, desired_p: int = 50):
-    if start > 10000:
-        await interaction.response.send_message('Sorry, max amount is 10000', ephemeral = True)
+async def start(interaction: discord.Interaction, pool_amount: int):
+    if pool_amount > 5000:
+        await interaction.response.send_message('Sorry, max betting pool is 5000', ephemeral = True)
         return
-    elif start <= 0:
-        await interaction.response.send_message('Invalid roll number. Try again please!', ephemeral = True)
+    elif pool_amount <= 0:
+        await interaction.response.send_message('Invalid betting pool number. Try again please!', ephemeral = True)
         return
 
     try:
-        create_new_session(start)
+        create_new_session(pool_amount)
     except Exception:
+        print('entered exception')
         await interaction.response.send_message('A bet is already on going, cannot start a new one.', ephemeral = True)
         return
 
-    await interaction.response.send_message('Beep boop, computing the odds...', ephemeral = True)
-    
-    (ideal_roll_num, p) = await get_ideal_rolls(start, float(desired_p)/100)
-    response = f'You\'ve started a bet! \nHouse roll should be {ideal_roll_num}, \nPercentage is {p * 100}.'
-    
-    await interaction.user.send(response)
-    await interaction.channel.send(f'@here A side bet has started for {start}! Place your bet now :)')
+    await interaction.response.send_message('Bet successfully started ;)', ephemeral = True)
+    await interaction.channel.send(f'A side bet has started for {pool_amount} gold! Place your bet now :)')
 
+@tree.command(description='Calculate house roll and win rate', guild = discord.Object(id=GUILD_ID))
+@commands.has_permissions(administrator=True)
+async def calc(interaction: discord.Interaction, starting_roll: int, desired_p: int):
+    await interaction.response.send_message('Beep boop, computing the odds...', ephemeral = True)
+
+    (ideal_roll_num, p) = get_ideal_rolls(starting_roll, float(desired_p)/100)
+    await interaction.user.send(f'Starting roll is {starting_roll}! \nHouse roll should be {ideal_roll_num}, \nPercentage is {p * 100}.')
 
 @tree.command(description='End the bet', guild = discord.Object(id=GUILD_ID))
 @commands.has_permissions(administrator=True)
@@ -90,7 +95,7 @@ async def end(interaction: discord.Interaction, house_won_yes_or_no: str):
     async for member in interaction.guild.fetch_members(limit=None):
         members_dict.update({str(member): member.display_name})
 
-    message_head = f"@here Betting has ended, the {'house' if house_won else 'players'} won! Here are the results: \n"
+    message_head = f"Betting has ended, the {'house' if house_won else 'players'} won! Here are the results: \n"
     responses = [message_head]
     for (userid, amount) in results:
         display_name = members_dict.get(userid)

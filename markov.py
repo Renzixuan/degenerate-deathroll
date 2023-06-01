@@ -1,10 +1,11 @@
 # markov.py
 import numpy as np
-from cache import AsyncLRU
 
-@AsyncLRU(maxsize=128)
-async def get_ideal_rolls(start, desired_p):
-    tmat = await get_markov_tmat(start)
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def get_ideal_rolls(start, desired_p):
+    tmat = get_markov_tmat(start)
 
     init_progression = np.array([1 / start] * start, dtype=np.float16)
 
@@ -21,7 +22,7 @@ async def get_ideal_rolls(start, desired_p):
 
     return (roll_count + 1, house_win_rate)
 
-async def get_markov_tmat(n):
+def get_markov_tmat(n):
     mat = []
     for i in range(n):
         row = np.array([0] * (i) + [1/(n-i)] * (n-i), dtype=np.float16)
