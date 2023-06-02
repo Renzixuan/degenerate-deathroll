@@ -66,7 +66,6 @@ async def start(interaction: discord.Interaction, pool_amount: int):
     try:
         create_new_session(pool_amount)
     except Exception:
-        print('entered exception')
         await interaction.response.send_message('A bet is already on going, cannot start a new one.', ephemeral = True)
         return
 
@@ -100,9 +99,9 @@ async def end(interaction: discord.Interaction, house_won_yes_or_no: str):
     for (userid, amount) in results:
         display_name = members_dict.get(userid)
         if house_won:
-            responses.append(f'☆ {display_name} lost {amount}\n')
+            responses.append(f'☆ {display_name} lost {amount} gold\n')
         else:
-            responses.append(f'★ {display_name} won {2 * int(amount)}\n')
+            responses.append(f'★ {display_name} won {amount} gold\n')
     
     await interaction.response.send_message("".join(responses))
 
